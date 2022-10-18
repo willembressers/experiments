@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  # ===========================================================================
+  # jupyterhub
+  # ===========================================================================
+  jupyterhub:
+    environment:
+      GRANT_SUDO: yes
+      MLFLOW_TRACKING_URI: 'http://mlflow:5000'
+    image: jupyter/minimal-notebook
+    container_name: jupyterhub
+    user: root
+    restart: unless-stopped
+    volumes:
+      - /Users/willem/Workspace:/home/jovyan
+      - /Users/willem/mlflow:/mlflow
+    expose:
+      - 8888
+    ports:
+      - 8888:8888
+    platform: linux/arm64/v8
+    command: > 
+      start-notebook.sh -NotebookApp.token=''
+
+  # ===========================================================================
+  # mlflow
+  # ===========================================================================
+  mlflow:
+    build:
+      context: ./docker/mlflow
+    image: mlflow
+    container_name: mlflow
+    restart: always
+    volumes:
+      - /Users/willem/mlflow:/mlflow
+    expose:
+      - 5000
+    ports:
+      - 5001:5000
+    platform: linux/arm64/v8
+    command: >
+      mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:///mydb.sqlite --default-artifact-root /mlflow
