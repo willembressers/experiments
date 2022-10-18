@@ -138,3 +138,5 @@ dmypy.json
 
 # data
 /datasets
+/graphs
+/checkpoints
